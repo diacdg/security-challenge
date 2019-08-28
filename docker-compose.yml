@@ -8,6 +8,6 @@ web:
   links:
   - php
 php:
-  image: php:7-fpm
+  build: .
   volumes:
   - .:/var/www
