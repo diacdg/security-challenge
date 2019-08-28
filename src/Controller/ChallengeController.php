@@ -18,6 +18,7 @@ class ChallengeController extends AbstractController
     {
         if (!$session->get('start')) {
             $session->set('start', date('Y-m-d H:i:s'));
+            $session->set('solver_id', bin2hex(random_bytes(20)));
         }
 
         $this->session = $session;
@@ -28,7 +29,33 @@ class ChallengeController extends AbstractController
      */
     public function list(): JsonResponse
     {
-        return new JsonResponse($this->getChallenges());
+        $challengesList = $this->getChallenges();
+        $solversList = $this->getSolvers();
+        $currentUser = $this->getCurrentUserId();
+        $lastSolved = -1;
+
+        foreach ($solversList as $solver => &$solvedTasks) {
+            foreach ($solvedTasks as &$task) {
+                $challengesList[$task]['solveCount']++;
+
+                if ($solver !== $currentUser) break;
+
+                $challengesList[$task]['solved'] = true;
+                // for next task logic
+                $lastSolved = $task;
+            }
+        }
+
+        foreach ($challengesList as $challengeId => &$challenge) {
+            if ($challengeId > $lastSolved + 1) {
+                // reset descriptions for unavailable tasks, only the next
+                // task should be available to read
+                $challenge['description'] = '';
+            } else {
+                $challenge['usable'] = true;
+            }
+        }
+        return new JsonResponse($challengesList);
     }
 
     /**
@@ -142,5 +169,10 @@ class ChallengeController extends AbstractController
     private function saveSolversJson(array $data): bool
     {
         return $this->saveJson($this->getSolversFilePath(), $data);
+    }
+
+    private function getCurrentUserId(): string
+    {
+        return $this->session->get('solver_id');
     }
 }
