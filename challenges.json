@@ -3,18 +3,30 @@
     "id": 0,
     "name": "first",
     "description": "test description",
-    "solveCount": 0
+    "solveCount": 0,
+    "admin": {
+      "caseSensitive": false,
+      "flag": "testflag1"
+    }
   },
   {
     "id": 1,
     "name": "second",
     "description": "test description",
-    "solveCount": 0
+    "solveCount": 0,
+    "admin": {
+      "caseSensitive": true,
+      "flag": "Testflag2"
+    }
   },
   {
     "id": 2,
     "name": "third",
     "description": "test description",
-    "solveCount": 0
+    "solveCount": 0,
+    "admin": {
+      "caseSensitive": false,
+      "flag": "testflag3"
+    }
   }
 ]

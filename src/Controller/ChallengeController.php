@@ -42,6 +42,9 @@ class ChallengeController extends AbstractController
         }
 
         foreach ($challengesList as $challengeId => &$challenge) {
+            // user has no business seeing these
+            unset($challenge['admin']);
+
             if ($challengeId > $lastSolved + 1) {
                 // reset descriptions for unavailable tasks, only the next
                 // task should be available to read
