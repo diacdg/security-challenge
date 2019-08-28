@@ -1,1 +1,14 @@
-[{"id":1,"name":"first","description":"test description","has_solved":false},{"id":2,"name":"second","description":"test description","has_solved":true}]
+[
+  {
+    "id": 1,
+    "name": "first",
+    "description": "test description",
+    "has_solved": false
+  },
+  {
+    "id": 2,
+    "name": "second",
+    "description": "test description",
+    "has_solved": true
+  }
+]
