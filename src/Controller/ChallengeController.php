@@ -173,6 +173,6 @@ class ChallengeController extends AbstractController
     private function getCurrentUserId(): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        return $request->headers->get('X-Solver-Id');
+        return $request->headers->get('X-Solver-Id') ?? '';
     }
 }
