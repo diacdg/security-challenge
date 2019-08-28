@@ -54,7 +54,7 @@ class ChallengeController extends AbstractController
 
                         if ($challenge['has_solved'] == false) {
                             $challenge['has_solved'] = true;
-                            $this->saveJson($challenges);
+                            $this->saveChallengesJson($challenges);
                         }
 
                         break;
@@ -87,9 +87,16 @@ class ChallengeController extends AbstractController
         return $rootDir.'/challenges.json';
     }
 
-    private function getChallenges(): array
+    private function getSolversFilePath(): string
     {
-        $json = json_decode(file_get_contents($this->getChallengesFilePath()), true);
+        $rootDir = $this->getParameter('kernel.project_dir');
+
+        return $rootDir.'/solvers.json';
+    }
+
+    private function loadJson(string $path): array
+    {
+        $json = json_decode(file_get_contents($path), true);
 
         if (!$json) {
             throw new \UnexpectedValueException('Invalid json file.');
@@ -98,9 +105,19 @@ class ChallengeController extends AbstractController
         return $json;
     }
 
-    private function saveJson(array $data): bool
+    private function getChallenges(): array
     {
-        $file = new \SplFileObject($this->getChallengesFilePath(), "w");
+        return $this->loadJson($this->getChallengesFilePath());
+    }
+
+    private function getSolvers(): array
+    {
+        return $this->loadJson($this->getSolversFilePath());
+    }
+
+    private function saveJson(string $path, array $data): bool
+    {
+        $file = new \SplFileObject($path, "w");
 
         for ($tries = 0; $tries <= 10; $tries++) {
             if ($file->flock(LOCK_EX)) {
@@ -115,5 +132,15 @@ class ChallengeController extends AbstractController
         }
 
         return false;
+    }
+
+    private function saveChallengesJson(array $data): bool
+    {
+        return $this->saveJson($this->getChallengesFilePath(), $data);
+    }
+
+    private function saveSolversJson(array $data): bool
+    {
+        return $this->saveJson($this->getSolversFilePath(), $data);
     }
 }
