@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,14 +14,9 @@ class ChallengeController extends AbstractController
 
     private $session;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(RequestStack $requestStack)
     {
-        if (!$session->get('start')) {
-            $session->set('start', date('Y-m-d H:i:s'));
-            $session->set('solver_id', bin2hex(random_bytes(20)));
-        }
-
-        $this->session = $session;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -61,8 +56,9 @@ class ChallengeController extends AbstractController
     /**
      * @Route("/validate", name="validate", methods={"POST"})
      */
-    public function validate(Request $request): JsonResponse
+    public function validate(): JsonResponse
     {
+        $request = $this->requestStack->getCurrentRequest();
         $data = json_decode($request->getContent(), true);
 
         if (!$this->isValid($data)) {
@@ -173,6 +169,7 @@ class ChallengeController extends AbstractController
 
     private function getCurrentUserId(): string
     {
-        return $this->session->get('solver_id');
+        $request = $this->requestStack->getCurrentRequest();
+        return $request->headers->get('X-Solver-Id');
     }
 }
